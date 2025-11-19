@@ -1,0 +1,15 @@
+#qrcode1 generation for pythonprint
+import qrcode
+import base64
+
+FILE_PATH = "pythonprint.ipynb"
+QR_OUTPUT = "pythonfileqr.png"
+
+with open(FILE_PATH, "rb") as f:
+    file_bytes = f.read()
+encoded = base64.b64encode(file_bytes).decode("utf-8")
+
+#generate QR code
+img= qrcode.make(encoded)
+img.save(QR_OUTPUT)
+print("QR coded generated:", QR_OUTPUT)
