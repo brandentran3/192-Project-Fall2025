@@ -1,0 +1,55 @@
+## reading github link, downloading the py file, and running it
+
+import cv2
+from pyzbar.pyzbar import decode
+import requests
+import subprocess
+import time
+import os
+
+OUTPUT_FILE = "downloaded_script.py"
+last_url = None
+
+cap = cv2.VideoCapture(0)
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    decoded = decode(frame)
+    for obj in decoded:
+        url = obj.data.decode("utf-8")
+
+        if url != last_url:
+            print("QR detected:", url)
+
+            try:
+                # Download the Python file
+                response = requests.get(url)
+                response.raise_for_status()
+
+                # Save it
+                with open(OUTPUT_FILE, "wb") as f:
+                    f.write(response.content)
+
+                print("Downloaded:", OUTPUT_FILE)
+
+                # Run it
+                result = subprocess.run(["python", OUTPUT_FILE], capture_output=True, text=True)
+                print(result.stdout)
+                print(result.stderr)
+
+                print("Running downloaded script...")
+
+                last_url = url
+
+            except Exception as e:
+                print("Error downloading or running file:", e)
+
+    cv2.imshow("QR Scanner", frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
