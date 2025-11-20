@@ -1,0 +1,5 @@
+panda.move_to_start()
+pose = panda.get_pose()
+pose[2,3] -= .1
+q = panda_py.ik(pose)
+panda.move_to_joint_position(q)
